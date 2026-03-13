@@ -35,6 +35,16 @@ export default class WindowManager {
         const childWindow = window.open(frameOrigin, childName, frameOptions);
 
         if (childWindow) {
+            // Re-focus every already-tracked popup so that opening a new one does not
+            // minimize or push existing popups behind the parent window.  The newly
+            // opened window receives focus last (via window.open) and therefore sits
+            // on top, while all previously opened popups are restored to the foreground.
+            for (const wnd of managedWindows) {
+                if ( !(wnd?.closed) ) {
+                    wnd.focus();
+                }
+            }
+
             managedWindows.add(childWindow);
 
             // Remove child from the tracked set once it is closed;
